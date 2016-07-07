@@ -6,35 +6,88 @@ title: OAuth 2.0
 # Overview
 
 The OAuth 2.0 API endpoints enable clients to use [OAuth 2.0 workflows](https://tools.ietf.org/html/rfc6749) with Okta.
-This authorization layer separates the role of client from that of resource owner by providing the client with an access token
+This authorization layer separates the role of client from that of resource owner by providing the client with an Access Token
 that can define scope, lifetime, and other attributes. 
 
 Additionally, these endpoints support the use of [OpenID Connect](/docs/api/resources/oidc.html) for OpenID Connect workflows such as social authentication.
 
 > This API is currently in **Early Access** status.  It has been tested as thoroughly as a Generally Available feature. Contact Support to enable this feature.
 
-## Tokens and Flows
+Okta is the identity provider responsible for verifying the identity of users and applications that exist in an organization’s directory, 
+and ultimately issuing access tokens upon successful authentication of those users and applications. 
 
-Using Oauth, OpenID Connect (OIDC), and Okta to manage authentication and authorization involves the use of different tokens.
+The basic authentication flow with Okta as the identity provider:
+
+1. The client sends an authorization request to Okta's authorization server in reference to a resource owner.
+2. Okta verifies the client with the resource owner, and if successful, returns an authorization grant to the client.
+3. The client receives the authorization grant, whose type depends on how the client requested authorization. 
+4. The client sends the authorization grant to Okta's authorization server and requests an  Access Token.
+5. Okta approves or denies the requested scopes.
+6. Okta authenticates the client, validates the authorization grant, and if valid, mints an Access Token and sends it in the response. 
+
+> Important: Okta uses public key cryptography to sign tokens and verify that they are valid. 
+See the last section of [Access Tokens](#access-tokens) for more information on the logic your application must have to ensure it’s always updated with the latest keys.
+
+The properties you need depend on which client profile and use case you are targeting, as explained in [Choosing the Right Workflow](choosing-the-right-workflow).
+
+## Claims
+
+ID tokens issued by Okta contain claims, which are statements about a subject (user).  
+For example, the claim can be about a name, identity, key, group, or privilege. The claims in a security token are dependent upon the type of token, 
+the type of credential used to authenticate the user, and the application configuration.
+
+## Supported OAuth 2.0 flows
+
+Okta supports the following OAuth 2.0 flows, which are documented in the [OAuth spec](https://tools.ietf.org/html/rfc6749):
+
+* Implicit flow for client-side web applications such as single-page apps or server-side apps with an end user
+* Authorization code flow for server-side web applications such as when access must be long-lived, or the client is a web application server, or whenever the Access Token shouldn't be shared with the browser
+* Client Credentials flow for clients that don't need delegated access in the OAuth flow
+* Hybrid flows, documented in [OpenID Connect](#openid.html)
+
+### Implicit flow
+
+![Implicit flow with OAuth 2.0, no OpenID Connect](/assets/img/implicit_oauth20.png)
+
+### Authorization code flow
+
+![Authorization code flow with OAuth 2.0, no OpenID Connect](/assets/img/auth_code_flow.png)
+
+### Client credential code flow
+
+![Client credential flow with OAuth 2.0, no OpenID Connect](/assets/img/client_cred_flow.png)
+
+\* The Access Token request is made by providing an authentication code, client ID, credential, redirect URI and App ID URI.
+
+\** The Access Token is returned with a refresh token, so the client doesn't have to repeat authentication steps.
+    
+### Native App Requirements
+ 
+Be aware of two important requirements for native apps:
+ 
+* For native applications, the *client_id* and *client_secret* are embedded in the source code of the application. Thus, *client_secret* is not a secret.
+* Native apps must use [PKCE](https://tools.ietf.org/html/rfc7636) to mitigate authorization code interception. For more information, see [OAuth2.0](http://developer.okta.com/docs/api/resources/oauth2#parameter-details).
+
+### Tokens and Flows
+
+Using Oauth 2.0 and Okta to manage authentication and authorization involves the use of different tokens.
 Each token serves a particular part of a flow, and has different behaviors and contents.
 
 ![Tokens, OAuth, and Okta](/assets/img/tokens_and_flows1.png)
 
-Scopes are defined in the request parameter, and claims are in the token returned from the request.
+Scopes are defined in the request parameter, and claims are in the Access Token returned from the request.
+
+>For more information about OpenID Connect and ID Tokens, see [OpenID Connect](/docs/api/resources/oidc.html). They are included here for completeness.
 
 * ID Tokens are returned with all requests to `/oauth2/v1/authorize`. In addition to reserve scopes and claims, ID Tokens contain an authorization grant.
-* App Tokens are
-* Access Tokens are returned from requests to `/oauth2/v1/token` if the request contains an authorization code or Refresh Token.
-* Okta Tokens are
-* Refresh Token ?
-* Bearer Token ?
+* Access Tokens and Refresh tokens are returned from requests to `/oauth2/v1/token` if the request contains an authorization code or Refresh Token.
 
 ### Tokens and Scopes
 
 Okta provides pre-defined scopes called reserve scopes that you can specify in the request. Use the `scope` parameter to define the scopes, any
 combination of `openid`, `profile`, `email`, `address`, and `phone`. <<link to that section when merged>>
 
-You can also define your own custom scopes in the request. <<link to that section when merged>> 
+You can also define your own custom scopes in the request. <<link to section when merged>>
 
 ## Endpoints
 
