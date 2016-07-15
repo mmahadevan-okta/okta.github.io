@@ -38,7 +38,7 @@ See the last section of [Validating ID Tokens](#validating-id-tokens) for more i
 you must have in your application to ensure it’s always updated with the latest keys.
 
 The flow of requests and responses for the authentication process is based on OAuth 2.0 and OpenID Connect protocols.
-The properties you need depend on which client profile and use case you are targeting, as explained in [Choosing the Right Workflow](choosing-the-right-workflow).
+The properties you need depend on which client profile and use case you are targeting, as explained in [Choosing the Right Flow](#choosing-the-right-flow).
 
 ## Claims
 
